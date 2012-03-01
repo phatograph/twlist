@@ -19,6 +19,8 @@ var OAuth = require('./node-oauth').OAuth,
                  "HMAC-SHA1"),
     accessToken, // 47032387-5pUsKx4k3f00O6FjhbzMDxiluhLdyDHYDEJzatm3Y
     accessTokenSecret, // ITlIYEyr48IBNTVb5hD6Jp1vEwNuDgbesu2H9THAjLc
+    oauthToken,
+    oauthTokenSecret,
     getAllLists = function (callback) {
       oAuth.get('https://api.twitter.com/1/lists.json?screen_name=phatograph',
                accessToken,
@@ -50,11 +52,26 @@ app.get('/', function (req, res) {
 
 app.get('/auth', function (req, res) {
   oAuth.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
-    if (error) new Error(error.data)
+    if (error) {
+      new Error(error.data)
+    }
     else {
+      oauthToken = oauth_token;
+      oauthTokenSecret = oauth_token_secret;
       res.redirect('https://twitter.com/oauth/authenticate?oauth_token=' + oauth_token)
      }
   });
+});
+
+app.get('/oauth_callback', function (req, res, next) {    
+  oa.getOAuthAccessToken(oauthToken, oauthTokenSecret, req.query.oauth_verifier, 
+    function (error, oauth_access_token, oauth_access_token_secret, results) {
+      if (error) {
+        new Error(error)
+      }
+      accessToken = oauth_access_token;
+      accessTokenSecret = oauth_access_token_secret;
+    });
 });
 
 app.get('/list/:slug', function (req, res) {
