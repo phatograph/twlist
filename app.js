@@ -48,6 +48,15 @@ app.get('/', function (req, res) {
   });
 });
 
+app.get('/auth', function (req, res) {
+  oAuth.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
+    if (error) new Error(error.data)
+    else {
+      res.redirect('https://twitter.com/oauth/authenticate?oauth_token=' + oauth_token)
+     }
+  });
+});
+
 app.get('/list/:slug', function (req, res) {
   followingIds = null,
   inListIds = [];
@@ -64,6 +73,27 @@ app.get('/getAllMembersInList/:slug', function (req, res) {
       users: data.users
     });
   });
+});
+
+app.get('/removeMembersFromList/:id', function (req, res) {
+  oAuth.post('https://api.twitter.com/1/lists/members/destroy.json',
+    accessToken,
+    accessTokenSecret,
+    {
+      'owner_screen_name': 'phatograph',
+      'slug': 'footballer',
+      'user_id': req.params['id']
+    },
+    function(error, data) {
+      var flag = true;
+      if(error) {
+        console.log(require('sys').inspect(error));
+        flag = false;
+      }
+      res.send({
+        status: flag
+      });
+    });
 });
 
 app.listen(process.env.PORT || 3000, function() {
