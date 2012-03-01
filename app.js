@@ -52,6 +52,9 @@ app.configure(function(){
 });
 
 app.get('/', function (req, res) {
+  if (!ownerScreenName) {
+    res.redirect('/auth');
+  }
   getAllLists(function (error, data) {
     if(error) {
       console.log(require('sys').inspect(error));
