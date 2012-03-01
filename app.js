@@ -172,8 +172,8 @@ app.get('/getAllMembersNotInList/:slug/:page', function (req, res) {
 
 app.get('/addMembersToList/:id', function (req, res) {
   oAuth.post('https://api.twitter.com/1/lists/members/create_all.json',
-    '47032387-5pUsKx4k3f00O6FjhbzMDxiluhLdyDHYDEJzatm3Y',
-    'ITlIYEyr48IBNTVb5hD6Jp1vEwNuDgbesu2H9THAjLc',
+    accessToken,
+    accessTokenSecret,
     {
       'owner_screen_name': 'phatograph',
       'slug': 'footballer',
