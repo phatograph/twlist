@@ -55,17 +55,19 @@ app.get('/', function (req, res) {
   if (!ownerScreenName) {
     res.redirect('/auth');
   }
-  getAllLists(function (error, data) {
-    if(error) {
-      console.log(require('sys').inspect(error));
-    }
-    else {
-      data = JSON.parse(data);
-      res.render('index', {
-        data: data.lists
-      });
-    }
-  });
+  else {
+    getAllLists(function (error, data) {
+      if(error) {
+        console.log(require('sys').inspect(error));
+      }
+      else {
+        data = JSON.parse(data);
+        res.render('index', {
+          data: data.lists
+        });
+      }
+    });
+  }
 });
 
 app.get('/auth', function (req, res) {
