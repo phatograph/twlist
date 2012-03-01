@@ -74,7 +74,7 @@ app.get('/auth', function (req, res) {
     else {
       oauthToken = oauth_token;
       oauthTokenSecret = oauth_token_secret;
-      ownerScreenName = screen_name;
+      ownerScreenName = results.screen_name;
       res.redirect('https://twitter.com/oauth/authenticate?oauth_token=' + oauth_token)
      }
   });
