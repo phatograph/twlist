@@ -24,7 +24,15 @@ var OAuth = require('./node-oauth').OAuth,
                accessToken,
                accessTokenSecret,
                callback);
-      };
+      },      
+    getAllMembersInList = function (slug, callback) {
+     oAuth.get('https://api.twitter.com/1/lists/members.json?slug=' + slug + '&owner_screen_name=phatograph&cursor=-1',
+               accessToken,
+               accessTokenSecret,
+               callback);
+    },
+    followingIds,
+    inListIds = [];
 
 app.get('/', function (req, res) {
   getAllLists(function (error, data) {
@@ -37,6 +45,24 @@ app.get('/', function (req, res) {
         data: data.lists
       });
     }
+  });
+});
+
+app.get('/list/:slug', function (req, res) {
+  followingIds = null,
+  inListIds = [];
+  
+  res.render('list', {
+    slug: req.params['slug']
+  });
+});
+
+app.get('/getAllMembersInList/:slug', function (req, res) {
+  getAllMembersInList(req.params['slug'], function(error, data) {
+    data = JSON.parse(data);
+    res.send({
+      users: data.users
+    });
   });
 });
 
