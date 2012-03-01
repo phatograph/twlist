@@ -1,0 +1,9 @@
+{
+  "name": "twlist",
+  "version": "0.0.1",
+  "dependencies": {
+    "express": ">= 0.0.1",
+    "jade": ">= 0.0.1",
+    "sass": ">= 0.0.1"
+  }
+}
