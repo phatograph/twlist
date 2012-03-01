@@ -10,7 +10,14 @@ app.configure('development', function(){
 });
 
 app.get('/', function (req, res) {
-  res.send('hi ..');
+  res.render('index', {
+    data: [
+      { name: 1, slug: 1 },
+      { name: 2, slug: 2 },
+      { name: 3, slug: 3 },
+      { name: 4, slug: 4 }
+    ]
+  });
 });
 
 app.listen(process.env.PORT || 3000, function() {

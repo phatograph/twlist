@@ -1,0 +1,7 @@
+.row
+  .span12
+    h2 Your Lists
+    ul
+      each d in data
+        li
+          a(href='list/' + d.slug) #{d.name}

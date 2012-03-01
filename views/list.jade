@@ -1,0 +1,120 @@
+.row
+  .span6
+    h2 Members not in list
+    table#memberList.table
+      thead
+        tr
+          th name
+          th #
+  .span6
+    h2 Members in List
+    table#notInList.table
+      thead
+        tr
+          th name
+          th #
+
+script
+  $(function (){
+  
+    var ajaxLoadString = '<img src="/images/ajaxload.gif" />',
+        getAllMembersNotInList = function (page) {
+          $('#memberList').append('<tr class="ajaxLoad"><td colspan="2">' + ajaxLoadString + '</td></tr>');
+          
+          $.getJSON('/getAllMembersNotInList/#{slug}/' + page, function (data) {
+            var page = data.page,
+                users = data.users,
+                inListIds = data.inListIds,
+                target = $('#memberList'),
+                str = '';
+        
+            if(users.length > 0) {
+              $.each(users, function (key, value) {
+                str += '<tr><td><label for="cb-' + value.id + '">' + value.name + ' (' + value.screen_name + ')</label></td><td><a class="add" href="' + value.id + '">Add to list</a></td></tr>';
+              })
+              if(users.length === 100) {
+                str += '<tr><td colspan="2"><a id="more" href="' + (~~page + 1) + '">more</a></td></tr>';
+              }
+              target.append(str);
+              $('#memberList .ajaxLoad').remove();
+            }
+          });
+        },
+        
+        getAllMembersInList = function () {
+          $('#notInList').append('<tr class="ajaxLoad"><td colspan="2">' + ajaxLoadString + '</td></tr>');
+        
+          $.getJSON('/getAllMembersInList/#{slug}', function (data) {
+            var users = data.users,
+                inListIds = data.inListIds,
+                target = $('#notInList'),
+                str = '';
+        
+            if(users.length > 0) {
+              $.each(users, function (key, value) {
+                str += '<tr><td><label for="cb-' + value.id + '">' + value.name + ' (' + value.screen_name + ')</label></td><td><a class="remove" href="' + value.id + '">Remove from list</a></td></tr>';
+              })
+              target.append(str);
+              $('#notInList .ajaxLoad').remove();
+            }
+          });
+        },
+        
+        addMembersToList = function (href, el) {
+          $.getJSON('/addMembersToList/' + href, function (data) {
+            var status = data.status;
+
+            if(status) {
+              el.html('(OK!)');
+            }
+            else {
+              el.html('(ERROR!)');
+            }
+          });
+        };
+    
+    // More
+    $('#memberList').delegate('#more', 'click', function (e) {
+      var el = $(this),
+          page = el.attr('href') || 0;
+
+      e.preventDefault();
+      el.parents('tr').remove();
+      getAllMembersNotInList(page);
+    });
+    
+    // Add
+    $('#memberList').delegate('.add', 'click', function (e) {
+      var el = $(this),
+          target = el.parents('tr').find('td:last-child');
+      
+      e.preventDefault();
+      target.html(ajaxLoadString);
+      addMembersToList(el.attr('href'), target);
+    });
+    
+    // Remove
+    $('#notInList').delegate('.remove', 'click', function (e) {
+      var el = $(this),
+          target = el.parents('tr').find('td:last-child');
+      
+      e.preventDefault();
+      target.html(ajaxLoadString);
+      
+      $.getJSON('/removeMembersFromList/' + el.attr('href'), function (data) {
+        var status = data.status;
+
+        if(status) {
+          target.html('(OK!)');
+        }
+        else {
+          target.html('(ERROR!)');
+        }
+      });
+    });
+    
+    // Kick off
+    getAllMembersNotInList(0);
+    getAllMembersInList();
+    
+  });
