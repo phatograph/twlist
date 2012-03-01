@@ -53,7 +53,8 @@ app.get('/', function (req, res) {
 app.get('/auth', function (req, res) {
   oAuth.getOAuthRequestToken(function(error, oauth_token, oauth_token_secret, results){
     if (error) {
-      new Error(error.data)
+      console.log(error)
+      res.send('oops ..');
     }
     else {
       oauthToken = oauth_token;
@@ -67,10 +68,14 @@ app.get('/oauth_callback', function (req, res, next) {
   oa.getOAuthAccessToken(oauthToken, oauthTokenSecret, req.query.oauth_verifier, 
     function (error, oauth_access_token, oauth_access_token_secret, results) {
       if (error) {
-        new Error(error)
+        console.log(error)
+        res.send('oops ..');
       }
-      accessToken = oauth_access_token;
-      accessTokenSecret = oauth_access_token_secret;
+      else {
+        accessToken = oauth_access_token;
+        accessTokenSecret = oauth_access_token_secret;
+        res.redirect('/');
+      }
     });
 });
 
