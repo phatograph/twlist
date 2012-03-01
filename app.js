@@ -1,15 +1,6 @@
 var express = require('express'),
-    app = express.createServer();
-
-app.configure('development', function(){
-  app.set('views', __dirname + '/views');
-  app.set('view engine', 'jade');
-  
-  app.use(express.compiler({ src: __dirname + '/public', enable: ['sass'] }));
-  app.use(express.static(__dirname + '/public'));
-});
-
-var OAuth = require('./node-oauth').OAuth,
+    app = express.createServer(),
+    OAuth = require('./node-oauth').OAuth,
     oAuth = new OAuth("http://twitter.com/oauth/request_token",
                  "http://twitter.com/oauth/access_token", 
                  'UqGXXq5K3yt8kTE0kdyq3g',
@@ -21,20 +12,43 @@ var OAuth = require('./node-oauth').OAuth,
     accessTokenSecret, // ITlIYEyr48IBNTVb5hD6Jp1vEwNuDgbesu2H9THAjLc
     oauthToken,
     oauthTokenSecret,
+    followingIds,
+    inListIds = [],
+    getMembersInfomation = function (ids, page, callback) {
+     ids = ids.slice(page * 100, (~~page + 1) * 100);
+
+     oAuth.get('https://api.twitter.com/1/users/lookup.json?user_id=' + ids.join(','),
+               accessToken,
+               accessTokenSecret,
+               callback);
+    },
+    getAllFollowings = function (callback) {
+     oAuth.get('https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=phatograph',
+               accessToken,
+               accessTokenSecret,
+               callback);
+    },
     getAllLists = function (callback) {
       oAuth.get('https://api.twitter.com/1/lists.json?screen_name=phatograph',
                accessToken,
                accessTokenSecret,
                callback);
-      },      
+    },      
     getAllMembersInList = function (slug, callback) {
      oAuth.get('https://api.twitter.com/1/lists/members.json?slug=' + slug + '&owner_screen_name=phatograph&cursor=-1',
                accessToken,
                accessTokenSecret,
                callback);
-    },
-    followingIds,
-    inListIds = [];
+    };
+
+
+app.configure('development', function(){
+  app.set('views', __dirname + '/views');
+  app.set('view engine', 'jade');
+
+  app.use(express.compiler({ src: __dirname + '/public', enable: ['sass'] }));
+  app.use(express.static(__dirname + '/public'));
+});
 
 app.get('/', function (req, res) {
   getAllLists(function (error, data) {
@@ -95,6 +109,86 @@ app.get('/getAllMembersInList/:slug', function (req, res) {
       users: data.users
     });
   });
+});
+
+app.get('/getAllMembersNotInList/:slug/:page', function (req, res) {
+  var page = req.params['page'],
+      slug = req.params['slug'],
+      getMembersInfomationCallback = function (error, data) {
+        if(error) {
+          console.log(require('sys').inspect(error));
+          users = [];
+        }
+        else {                                
+          users = JSON.parse(data);
+        }
+        res.send({
+          page: page,
+          users: users
+        });
+      },
+      processFollowings = function () {
+        if(!followingIds) {
+          getAllFollowings(function(error, data) {
+            if(error) console.log(require('sys').inspect(error));
+            else {
+              data = JSON.parse(data);
+              followingIds = data.ids;
+
+              // Begin - Remove ids in the list
+              followingIds.remove = function(from, to) {
+                var rest = this.slice((to || from) + 1 || this.length);
+                this.length = from < 0 ? this.length + from : from;
+                return this.push.apply(this, rest);
+              };
+
+              inListIds.forEach(function (item, index) {
+                followingIds.remove(followingIds.indexOf(item));
+              });
+              // End
+
+              getMembersInfomation(followingIds, page, getMembersInfomationCallback);
+            }
+          });
+        }
+        else {
+          getMembersInfomation(followingIds, page, getMembersInfomationCallback);
+        }
+      };
+      
+  if(inListIds.length === 0) {    
+    getAllMembersInList(slug, function(error, data) {
+      data = JSON.parse(data);
+      data.users.forEach(function (item, index) {
+        inListIds.push(item.id);
+      });
+      processFollowings();
+    });
+  }
+  else {
+    processFollowings();
+  }
+});
+
+app.get('/addMembersToList/:id', function (req, res) {
+  oAuth.post('https://api.twitter.com/1/lists/members/create_all.json',
+    '47032387-5pUsKx4k3f00O6FjhbzMDxiluhLdyDHYDEJzatm3Y',
+    'ITlIYEyr48IBNTVb5hD6Jp1vEwNuDgbesu2H9THAjLc',
+    {
+      'owner_screen_name': 'phatograph',
+      'slug': 'footballer',
+      'user_id': req.params['id']
+    },
+    function(error, data) {
+      var flag = true;
+      if(error) {
+        console.log(require('sys').inspect(error));
+        flag = false;
+      }
+      res.send({
+        status: flag
+      });
+    });
 });
 
 app.get('/removeMembersFromList/:id', function (req, res) {
