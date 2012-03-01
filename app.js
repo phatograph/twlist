@@ -170,13 +170,13 @@ app.get('/getAllMembersNotInList/:slug/:page', function (req, res) {
   }
 });
 
-app.get('/addMembersToList/:id', function (req, res) {
+app.get('/addMembersToList/:slug/:id', function (req, res) {
   oAuth.post('https://api.twitter.com/1/lists/members/create_all.json',
     accessToken,
     accessTokenSecret,
     {
       'owner_screen_name': 'phatograph',
-      'slug': 'footballer',
+      'slug': req.params['slug'],
       'user_id': req.params['id']
     },
     function(error, data) {
@@ -191,13 +191,13 @@ app.get('/addMembersToList/:id', function (req, res) {
     });
 });
 
-app.get('/removeMembersFromList/:id', function (req, res) {
+app.get('/removeMembersFromList/:slug/:id', function (req, res) {
   oAuth.post('https://api.twitter.com/1/lists/members/destroy.json',
     accessToken,
     accessTokenSecret,
     {
       'owner_screen_name': 'phatograph',
-      'slug': 'footballer',
+      'slug': req.params['slug'],
       'user_id': req.params['id']
     },
     function(error, data) {

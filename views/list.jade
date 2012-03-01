@@ -61,7 +61,7 @@ script
         },
         
         addMembersToList = function (href, el) {
-          $.getJSON('/addMembersToList/' + href, function (data) {
+          $.getJSON('/addMembersToList/#{slug}/' + href, function (data) {
             var status = data.status;
 
             if(status) {
@@ -101,7 +101,7 @@ script
       e.preventDefault();
       target.html(ajaxLoadString);
       
-      $.getJSON('/removeMembersFromList/' + el.attr('href'), function (data) {
+      $.getJSON('/removeMembersFromList/#{slug}/' + el.attr('href'), function (data) {
         var status = data.status;
 
         if(status) {
