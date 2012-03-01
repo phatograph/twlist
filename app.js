@@ -14,35 +14,36 @@ var express = require('express'),
     oauthTokenSecret,
     followingIds,
     inListIds = [],
+    ownerScreenName,
     getMembersInfomation = function (ids, page, callback) {
-     ids = ids.slice(page * 100, (~~page + 1) * 100);
+      ids = ids.slice(page * 100, (~~page + 1) * 100);
 
-     oAuth.get('https://api.twitter.com/1/users/lookup.json?user_id=' + ids.join(','),
-               accessToken,
-               accessTokenSecret,
-               callback);
+      oAuth.get('https://api.twitter.com/1/users/lookup.json?user_id=' + ids.join(','),
+                accessToken,
+                accessTokenSecret,
+                callback);
     },
     getAllFollowings = function (callback) {
-     oAuth.get('https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=phatograph',
-               accessToken,
-               accessTokenSecret,
-               callback);
+      oAuth.get('https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=' + ownerScreenName,
+                accessToken,
+                accessTokenSecret,
+                callback);
     },
     getAllLists = function (callback) {
-      oAuth.get('https://api.twitter.com/1/lists.json?screen_name=phatograph',
-               accessToken,
-               accessTokenSecret,
-               callback);
+       oAuth.get('https://api.twitter.com/1/lists.json?screen_name=' + ownerScreenName,
+                accessToken,
+                accessTokenSecret,
+                callback);
     },      
     getAllMembersInList = function (slug, callback) {
-     oAuth.get('https://api.twitter.com/1/lists/members.json?slug=' + slug + '&owner_screen_name=phatograph&cursor=-1',
-               accessToken,
-               accessTokenSecret,
-               callback);
+      oAuth.get('https://api.twitter.com/1/lists/members.json?slug=' + slug + '&owner_screen_name=' + ownerScreenName + '&cursor=-1',
+                accessToken,
+                accessTokenSecret,
+                callback);
     };
 
 
-app.configure('development', function(){
+app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
 
@@ -73,6 +74,7 @@ app.get('/auth', function (req, res) {
     else {
       oauthToken = oauth_token;
       oauthTokenSecret = oauth_token_secret;
+      ownerScreenName = screen_name;
       res.redirect('https://twitter.com/oauth/authenticate?oauth_token=' + oauth_token)
      }
   });
@@ -175,7 +177,7 @@ app.get('/addMembersToList/:slug/:id', function (req, res) {
     accessToken,
     accessTokenSecret,
     {
-      'owner_screen_name': 'phatograph',
+      'owner_screen_name':  ownerScreenName,
       'slug': req.params['slug'],
       'user_id': req.params['id']
     },
@@ -196,7 +198,7 @@ app.get('/removeMembersFromList/:slug/:id', function (req, res) {
     accessToken,
     accessTokenSecret,
     {
-      'owner_screen_name': 'phatograph',
+      'owner_screen_name': ownerScreenName,
       'slug': req.params['slug'],
       'user_id': req.params['id']
     },
