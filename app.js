@@ -65,7 +65,7 @@ app.get('/auth', function (req, res) {
 });
 
 app.get('/oauth_callback', function (req, res, next) {    
-  oa.getOAuthAccessToken(oauthToken, oauthTokenSecret, req.query.oauth_verifier, 
+  oAuth.getOAuthAccessToken(oauthToken, oauthTokenSecret, req.query.oauth_verifier, 
     function (error, oauth_access_token, oauth_access_token_secret, results) {
       if (error) {
         console.log(error)
