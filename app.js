@@ -55,7 +55,7 @@ app.configure(function(){
 
 app.get('/', function (req, res) {
   // Begin - local debugging
-  //ownerScreenName = 'phatograph';
+  //req.session.ownerScreenName = '_phatograph';
   //accessToken = '47032387-5pUsKx4k3f00O6FjhbzMDxiluhLdyDHYDEJzatm3Y';
   //accessTokenSecret = 'ITlIYEyr48IBNTVb5hD6Jp1vEwNuDgbesu2H9THAjLc';
   // End

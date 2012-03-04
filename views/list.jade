@@ -50,7 +50,7 @@ script
                 target = $('#notInList'),
                 str = '';
         
-            if(users.length > 0) {
+            if(users) {
               $.each(users, function (key, value) {
                 str += '<tr><td><label for="cb-' + value.id + '">' + value.name + ' (' + value.screen_name + ')</label></td><td><a class="remove" href="' + value.id + '">Remove from list</a></td></tr>';
               })
