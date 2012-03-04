@@ -22,20 +22,20 @@ var express = require('express'),
                 accessTokenSecret,
                 callback);
     },
-    getAllFollowings = function (callback) {
-      oAuth.get('https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=' + req.session.ownerScreenName,
+    getAllFollowings = function (ownerScreenName, callback) {
+      oAuth.get('https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=' + ownerScreenName,
                 accessToken,
                 accessTokenSecret,
                 callback);
     },
-    getAllLists = function (callback) {
-       oAuth.get('https://api.twitter.com/1/lists.json?screen_name=' + req.session.ownerScreenName,
+    getAllLists = function (ownerScreenName, callback) {
+       oAuth.get('https://api.twitter.com/1/lists.json?screen_name=' + ownerScreenName,
                 accessToken,
                 accessTokenSecret,
                 callback);
     },      
-    getAllMembersInList = function (slug, callback) {
-      oAuth.get('https://api.twitter.com/1/lists/members.json?slug=' + slug + '&owner_screen_name=' + req.session.ownerScreenName + '&cursor=-1',
+    getAllMembersInList = function (ownerScreenName, slug, callback) {
+      oAuth.get('https://api.twitter.com/1/lists/members.json?slug=' + slug + '&owner_screen_name=' + ownerScreenName + '&cursor=-1',
                 accessToken,
                 accessTokenSecret,
                 callback);
@@ -64,7 +64,7 @@ app.get('/', function (req, res) {
     res.redirect('/auth');
   }
   else {
-    getAllLists(function (error, data) {
+    getAllLists(req.session.ownerScreenName, function (error, data) {
       if(error) {
         console.log(require('sys').inspect(error));
       }
@@ -118,7 +118,7 @@ app.get('/list/:slug', function (req, res) {
 });
 
 app.get('/getAllMembersInList/:slug', function (req, res) {
-  getAllMembersInList(req.params['slug'], function(error, data) {
+  getAllMembersInList(req.session.ownerScreenName, req.params['slug'], function(error, data) {
     data = JSON.parse(data);
     res.send({
       users: data.users
@@ -144,7 +144,7 @@ app.get('/getAllMembersNotInList/:slug/:page', function (req, res) {
       },
       processFollowings = function () {
         if(!followingIds) {
-          getAllFollowings(function(error, data) {
+          getAllFollowings(req.session.ownerScreenName, function(error, data) {
             if(error) console.log(require('sys').inspect(error));
             else {
               data = JSON.parse(data);
