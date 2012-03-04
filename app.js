@@ -172,7 +172,7 @@ app.get('/getAllMembersNotInList/:slug/:page', function (req, res) {
       };
       
   if(inListIds.length === 0) {    
-    getAllMembersInList(slug, function(error, data) {
+    getAllMembersInList(req.session.ownerScreenName, slug, function(error, data) {
       data = JSON.parse(data);
       data.users.forEach(function (item, index) {
         inListIds.push(item.id);
