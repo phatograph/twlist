@@ -14,7 +14,6 @@ var express = require('express'),
     oauthTokenSecret,
     followingIds,
     inListIds = [],
-    ownerScreenName,
     getMembersInfomation = function (ids, page, callback) {
       ids = ids.slice(page * 100, (~~page + 1) * 100);
 
@@ -24,19 +23,19 @@ var express = require('express'),
                 callback);
     },
     getAllFollowings = function (callback) {
-      oAuth.get('https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=' + ownerScreenName,
+      oAuth.get('https://api.twitter.com/1/friends/ids.json?cursor=-1&screen_name=' + req.session.ownerScreenName,
                 accessToken,
                 accessTokenSecret,
                 callback);
     },
     getAllLists = function (callback) {
-       oAuth.get('https://api.twitter.com/1/lists.json?screen_name=' + ownerScreenName,
+       oAuth.get('https://api.twitter.com/1/lists.json?screen_name=' + req.session.ownerScreenName,
                 accessToken,
                 accessTokenSecret,
                 callback);
     },      
     getAllMembersInList = function (slug, callback) {
-      oAuth.get('https://api.twitter.com/1/lists/members.json?slug=' + slug + '&owner_screen_name=' + ownerScreenName + '&cursor=-1',
+      oAuth.get('https://api.twitter.com/1/lists/members.json?slug=' + slug + '&owner_screen_name=' + req.session.ownerScreenName + '&cursor=-1',
                 accessToken,
                 accessTokenSecret,
                 callback);
@@ -46,13 +45,22 @@ var express = require('express'),
 app.configure(function(){
   app.set('views', __dirname + '/views');
   app.set('view engine', 'jade');
+  
+  app.use(express.cookieParser());
+  app.use(express.session({ secret: "romeocat" }));
 
   app.use(express.compiler({ src: __dirname + '/public', enable: ['sass'] }));
   app.use(express.static(__dirname + '/public'));
 });
 
 app.get('/', function (req, res) {
-  if (!ownerScreenName) {
+  // Begin - local debugging
+  //ownerScreenName = 'phatograph';
+  //accessToken = '47032387-5pUsKx4k3f00O6FjhbzMDxiluhLdyDHYDEJzatm3Y';
+  //accessTokenSecret = 'ITlIYEyr48IBNTVb5hD6Jp1vEwNuDgbesu2H9THAjLc';
+  // End
+  
+  if (!req.session.ownerScreenName) {
     res.redirect('/auth');
   }
   else {
@@ -94,7 +102,7 @@ app.get('/oauth_callback', function (req, res, next) {
       else {
         accessToken = oauth_access_token;
         accessTokenSecret = oauth_access_token_secret;
-        ownerScreenName = results.screen_name;
+        req.session.ownerScreenName = results.screen_name;
         res.redirect('/');
       }
     });
@@ -182,7 +190,7 @@ app.get('/addMembersToList/:slug/:id', function (req, res) {
     accessToken,
     accessTokenSecret,
     {
-      'owner_screen_name':  ownerScreenName,
+      'owner_screen_name':  req.session.ownerScreenName,
       'slug': req.params['slug'],
       'user_id': req.params['id']
     },
@@ -203,7 +211,7 @@ app.get('/removeMembersFromList/:slug/:id', function (req, res) {
     accessToken,
     accessTokenSecret,
     {
-      'owner_screen_name': ownerScreenName,
+      'owner_screen_name': req.session.ownerScreenName,
       'slug': req.params['slug'],
       'user_id': req.params['id']
     },
