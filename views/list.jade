@@ -32,7 +32,7 @@ script
         
             if(users.length > 0) {
               $.each(users, function (key, value) {
-                str += '<tr><td><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc">' + value.description + '</div></td><td><a class="add" href="' + value.id + '">Add</a></td></tr>';
+                str += '<tr><td class="img"><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc" title="' + value.description + '">' + value.description + '</div></td><td><a class="add" href="' + value.id + '">Add</a></td></tr>';
               })
               if(users.length === 100) {
                 str += '<tr><td colspan="3"><a id="more" href="' + (~~page + 1) + '">more</a></td></tr>';
@@ -54,7 +54,7 @@ script
         
             if(users) {
               $.each(users, function (key, value) {
-                str += '<tr><td><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc">' + value.description + '</div></td><td><a class="remove" href="' + value.id + '">Remove</a></td></tr>';
+                str += '<tr><td class="img"><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc" title="' + value.description + '">' + value.description + '</div></td><td><a class="remove" href="' + value.id + '">Remove</a></td></tr>';
               })
               target.append(str);
               $('#notInList .ajaxLoad').remove();
