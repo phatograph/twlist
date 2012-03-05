@@ -4,6 +4,7 @@
     table#memberList.table
       thead
         tr
+          th &nbsp;
           th name
           th #
   .span6
@@ -11,6 +12,7 @@
     table#notInList.table
       thead
         tr
+          th &nbsp;
           th name
           th #
 
@@ -19,7 +21,7 @@ script
   
     var ajaxLoadString = '<img src="/images/ajaxload.gif" />',
         getAllMembersNotInList = function (page) {
-          $('#memberList').append('<tr class="ajaxLoad"><td colspan="2">' + ajaxLoadString + '</td></tr>');
+          $('#memberList').append('<tr class="ajaxLoad"><td colspan="3">' + ajaxLoadString + '</td></tr>');
           
           $.getJSON('/getAllMembersNotInList/#{slug}/' + page, function (data) {
             var page = data.page,
@@ -30,10 +32,10 @@ script
         
             if(users.length > 0) {
               $.each(users, function (key, value) {
-                str += '<tr><td><label for="cb-' + value.id + '">' + value.name + ' (' + value.screen_name + ')</label></td><td><a class="add" href="' + value.id + '">Add to list</a></td></tr>';
+                str += '<tr><td><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc">' + value.description + '</div></td><td><a class="add" href="' + value.id + '">Add</a></td></tr>';
               })
               if(users.length === 100) {
-                str += '<tr><td colspan="2"><a id="more" href="' + (~~page + 1) + '">more</a></td></tr>';
+                str += '<tr><td colspan="3"><a id="more" href="' + (~~page + 1) + '">more</a></td></tr>';
               }
               target.append(str);
               $('#memberList .ajaxLoad').remove();
@@ -42,7 +44,7 @@ script
         },
         
         getAllMembersInList = function () {
-          $('#notInList').append('<tr class="ajaxLoad"><td colspan="2">' + ajaxLoadString + '</td></tr>');
+          $('#notInList').append('<tr class="ajaxLoad"><td colspan="3">' + ajaxLoadString + '</td></tr>');
         
           $.getJSON('/getAllMembersInList/#{slug}', function (data) {
             var users = data.users,
@@ -52,7 +54,7 @@ script
         
             if(users) {
               $.each(users, function (key, value) {
-                str += '<tr><td><label for="cb-' + value.id + '">' + value.name + ' (' + value.screen_name + ')</label></td><td><a class="remove" href="' + value.id + '">Remove from list</a></td></tr>';
+                str += '<tr><td><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc">' + value.description + '</div></td><td><a class="remove" href="' + value.id + '">Remove</a></td></tr>';
               })
               target.append(str);
               $('#notInList .ajaxLoad').remove();
