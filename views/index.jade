@@ -1,7 +1,6 @@
-.row
-  .span12
-    h2 Your Lists
-    ul
-      each d in data
-        li
-          a(href='list/' + d.slug) #{d.name}
+.row.hero-unit
+  h2 Your Lists
+  ul.nav.nav-pills.nav-stacked
+    each d in data
+      li
+        a(href='list/' + d.slug) #{d.name}

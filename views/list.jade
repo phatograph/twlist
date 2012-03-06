@@ -1,15 +1,15 @@
-.row
-  .span6
+.row.hero-unit
+  .span5
     h2 Members not in list
-    table#memberList.table
+    table#memberList.table-striped
       thead
         tr
           th &nbsp;
           th name
           th #
-  .span6
+  .span5
     h2 Members in List
-    table#notInList.table
+    table#notInList.table-striped
       thead
         tr
           th &nbsp;
@@ -32,7 +32,7 @@ script
         
             if(users.length > 0) {
               $.each(users, function (key, value) {
-                str += '<tr><td class="img"><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc" title="' + value.description + '">' + value.description + '</div></td><td><a class="add" href="' + value.id + '">Add</a></td></tr>';
+                str += '<tr><td class="img"><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc" title="' + value.description + '">' + value.description + '</div></td><td><a class="btn btn-success add" href="' + value.id + '">Add</a></td></tr>';
               })
               if(users.length === 100) {
                 str += '<tr><td colspan="3"><a id="more" href="' + (~~page + 1) + '">more</a></td></tr>';
@@ -54,7 +54,7 @@ script
         
             if(users) {
               $.each(users, function (key, value) {
-                str += '<tr><td class="img"><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc" title="' + value.description + '">' + value.description + '</div></td><td><a class="remove" href="' + value.id + '">Remove</a></td></tr>';
+                str += '<tr><td class="img"><img src="' + value.profile_image_url + '" /></td><td><div>' + value.name + ' (' + value.screen_name + ')</div><div class="desc" title="' + value.description + '">' + value.description + '</div></td><td><a class="btn btn-danger remove" href="' + value.id + '">Remove</a></td></tr>';
               })
               target.append(str);
               $('#notInList .ajaxLoad').remove();
